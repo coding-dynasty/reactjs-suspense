@@ -6,39 +6,24 @@ const api_url = "https://api.thecatapi.com/v1/images/search";
 
 function App() {
   const [data, setData] = useState(null);
-  const [shouldFetch, setShouldFetch] = useState(true);
 
   useEffect(() => {
-    const controller = new AbortController();
-    const abortSignal = controller.signal;
-
     const fetchData = async () => {
       try {
-        const response = await axios.get(api_url, { signal: abortSignal });
+        const response = await axios.get(api_url);
 
         const responseData = response.data[0];
 
         setData(responseData);
       } catch (error) {
-        if (axios.isCancel(error)) {
-          // Handle request cancellation
-          console.log("Request canceled:", error.message);
-        } else {
-          // Handle other errors
-          console.error("Error:", error.message);
-        }
+        console.error("Error:", error.message);
       }
     };
 
-    if (shouldFetch) {
-      fetchData();
-      setShouldFetch(false);
-    }
+    fetchData();
 
-    return () => {
-      controller.abort();
-    };
-  }, [shouldFetch]);
+    return () => {};
+  }, []);
 
   return (
     <div>
@@ -54,8 +39,6 @@ function App() {
       ) : (
         <p>{data === null ? "Loading..." : "Failed to fetch data."}</p>
       )}
-
-      <button onClick={() => setShouldFetch(true)}>Fetch Again!</button>
     </div>
   );
 }
